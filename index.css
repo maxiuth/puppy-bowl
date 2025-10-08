@@ -55,5 +55,15 @@ label {
 }
 
 button {
-  border-top: 5px;
+  margin-top: 2ch;
+}
+
+button a:hover {
+  background: #eee;
+  font-style: italic;
+}
+
+img {
+  width: 200px;
+  height: 200px;
 }

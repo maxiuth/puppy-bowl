@@ -1,10 +1,10 @@
 // === Constants ===
 const BASE = "https://fsa-puppy-bowl.herokuapp.com/api";
-const COHORT = "/2803-PUPPIES";
+const COHORT = "/2508-PUPPIES";
 const TEAMS = "/teams";
 const PLAYERS = "/players";
-const apiTeams = BASE + COHORT + TEAMS;
-const apiPlayers = BASE + COHORT + PLAYERS;
+const teamsAPI = BASE + COHORT + TEAMS;
+const playersAPI = BASE + COHORT + PLAYERS;
 
 // === State ===
 let puppies = [];
@@ -12,9 +12,9 @@ let selectedPuppy;
 
 async function addPuppy(puppy) {
   try {
-    const res = await fetch(apiPlayers, {
+    const res = await fetch(playersAPI, {
       method: "POST",
-      body: JSON.stringify(party),
+      body: JSON.stringify(puppy),
       headers: {
         "Content-Type": "application/json",
       },
@@ -28,7 +28,7 @@ async function addPuppy(puppy) {
 
 async function deletePuppy(id) {
   try {
-    const res = await fetch(apiPlayers + "/" + id, {
+    const res = await fetch(playersAPI + "/" + id, {
       method: "DELETE",
     });
     const json = await res.json();
@@ -40,24 +40,38 @@ async function deletePuppy(id) {
   }
 }
 
+// async function deletePuppy(id) {
+//   try {
+//     await fetch(playersAPI + "/" + id, {
+//       method: "DELETE",
+//     });
+//     selectedPuppy = undefined;
+//     await getPuppies();
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
+
 /** Updates state with all puppies/players from the API */
 async function getPuppies() {
   try {
-    const response = await fetch(apiPlayers);
+    const response = await fetch(playersAPI);
     const result = await response.json();
-    puppies = result.data;
+    puppies = result.data.players;
+    console.log(result);
     render();
   } catch (e) {
     console.error(e);
   }
 }
 
-/** Updates state with a single party from the API */
+/** Updates state with a single puppy from the API */
 async function getPuppy(id) {
   try {
-    const response = await fetch(apiPlayers + "/" + id);
+    const response = await fetch(playersAPI + "/" + id);
     const result = await response.json();
-    selectedPuppy = result.data;
+    selectedPuppy = result.data.player;
+    console.log(selectedPuppy);
     render();
   } catch (e) {
     console.error(e);
@@ -66,7 +80,7 @@ async function getPuppy(id) {
 
 // === Components ===
 
-/** Party name that shows more details about the party when clicked */
+/** Puppy name that shows more details about the puppy when clicked */
 function PuppyListItem(puppy) {
   const $li = document.createElement("li");
 
@@ -92,7 +106,7 @@ function PuppyList() {
   return $ul;
 }
 
-/** Detailed information about the selected party */
+/** Detailed information about the selected puppy */
 function SelectedPuppy() {
   if (!selectedPuppy) {
     const $p = document.createElement("p");
@@ -103,21 +117,22 @@ function SelectedPuppy() {
   const $puppy = document.createElement("section");
   $puppy.innerHTML = `
     <h3>${selectedPuppy.name} #${selectedPuppy.id}</h3>
-    // <time datetime="${selectedParty.date}">
-    //   ${selectedParty.date.slice(0, 10)}
-    // </time>
-    // <address>${selectedParty.location}</address>
-    // <p>${selectedParty.description}</p>
+    <figure>
+        <img src="${selectedPuppy.imageUrl}" alt="${selectedPuppy.name}" />
+    </figure>
+    <p>Breed: ${selectedPuppy.breed}</p>
+    <p>Status: ${selectedPuppy.status}</p>
+    <p>TeamID: ${selectedPuppy.teamID}</p>
     <button>Delete Puppy</button>
   `;
 
-  const $delete = $party.querySelector("button");
+  const $delete = $puppy.querySelector("button");
   $delete.addEventListener("click", function (e) {
-    deleteParty(selectedParty.id);
+    deletePuppy(selectedPuppy.id);
     render();
   });
 
-  return $party;
+  return $puppy;
 }
 
 function newPuppyForm() {
@@ -156,19 +171,19 @@ function render() {
     <h1>Puppy Bowl</h1>
     <main>
       <section>
-        <h2>Upcoming Parties</h2>
-        <PartyList></PartyList>
+        <h2>Puppies</h2>
+        <PuppyList></PuppyList>
         <NewPuppyForm></NewPuppyForm>
       </section>
       <section id="selected">
-        <h2>Party Details</h2>
-        <SelectedParty></SelectedParty>
+        <h2>Puppy Details</h2>
+        <SelectedPuppy></SelectedPuppy>
       </section>
     </main>
   `;
 
-  $app.querySelector("PartyList").replaceWith(PuppyList());
-  //$app.querySelector("SelectedParty").replaceWith(SelectedParty());
+  $app.querySelector("PuppyList").replaceWith(PuppyList());
+  $app.querySelector("SelectedPuppy").replaceWith(SelectedPuppy());
   $app.querySelector("NewPuppyForm").replaceWith(newPuppyForm());
 }
 
