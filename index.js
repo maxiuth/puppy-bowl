@@ -1,49 +1,16 @@
 // === Constants ===
-const BASE = "https://fsa-crud-2aa9294fe819.herokuapp.com/api";
-const COHORT = "/2508-FTB-ET-WEB-FT"; // Make sure to change this!
-const API = BASE + COHORT;
+const BASE = "https://fsa-puppy-bowl.herokuapp.com/api/";
+const COHORT = "/2508-PUPPIES";
+const TEAMS = "/teams";
+const PLAYERS = "/players";
+const apiTeams = BASE + COHORT + TEAMS;
+const apiPlayers = BASE + COHORT + PLAYERS;
 
 // === State ===
-let parties = [];
-let selectedParty;
-let rsvps = [];
-let guests = [];
-
-// function newPartyForm() {
-//   const $form = document.createElement("form");
-//   $form.innerHTML = `
-//   <h2>Add a New Party</h2>
-//     <label>
-//         Party Name
-//         <input name="name" required />
-//     </label>
-//     <label>
-//         Description
-//         <input name="description" required />
-//     </label>
-//     <label>
-//         Date
-//         <input type="date" name="event-date" required />
-//     </label>
-//     <label>
-//         Location
-//         <input name="location" required />
-//     </label>
-//     <button>Add Party</button>
-//     `;
-//   $form.addEvenListener("submit", function (e) {
-//     e.preventDefault();
-//     const formData = new FormData($form);
-//     const date = new Date(formData.get("event-date"));
-//     addParty({
-//       name: formData.get("name"),
-//       description: formData.get("description"),
-//       date: date.toISOString(),
-//       location: formData.get("location"),
-//     });
-//   });
-//   return $form;
-// }
+let puppies = [];
+let selectedPuppy;
+// let rsvps = [];
+// let guests = [];
 
 async function addParty(party) {
   try {
@@ -100,28 +67,28 @@ async function getParty(id) {
 }
 
 /** Updates state with all RSVPs from the API */
-async function getRsvps() {
-  try {
-    const response = await fetch(API + "/rsvps");
-    const result = await response.json();
-    rsvps = result.data;
-    render();
-  } catch (e) {
-    console.error(e);
-  }
-}
+// async function getRsvps() {
+//   try {
+//     const response = await fetch(API + "/rsvps");
+//     const result = await response.json();
+//     rsvps = result.data;
+//     render();
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
 
 /** Updates state with all guests from the API */
-async function getGuests() {
-  try {
-    const response = await fetch(API + "/guests");
-    const result = await response.json();
-    guests = result.data;
-    render();
-  } catch (e) {
-    console.error(e);
-  }
-}
+// async function getGuests() {
+//   try {
+//     const response = await fetch(API + "/guests");
+//     const result = await response.json();
+//     guests = result.data;
+//     render();
+//   } catch (e) {
+//     console.error(e);
+//   }
+// }
 
 // === Components ===
 
@@ -182,46 +149,41 @@ function SelectedParty() {
 }
 
 /** List of guests attending the selected party */
-function GuestList() {
-  const $ul = document.createElement("ul");
-  const guestsAtParty = guests.filter((guest) =>
-    rsvps.find(
-      (rsvp) => rsvp.guestId === guest.id && rsvp.eventId === selectedParty.id
-    )
-  );
+// function GuestList() {
+//   const $ul = document.createElement("ul");
+//   const guestsAtParty = guests.filter((guest) =>
+//     rsvps.find(
+//       (rsvp) => rsvp.guestId === guest.id && rsvp.eventId === selectedParty.id
+//     )
+//   );
 
-  // Simple components can also be created anonymously:
-  const $guests = guestsAtParty.map((guest) => {
-    const $guest = document.createElement("li");
-    $guest.textContent = guest.name;
-    return $guest;
-  });
-  $ul.replaceChildren(...$guests);
+//   // Simple components can also be created anonymously:
+//   const $guests = guestsAtParty.map((guest) => {
+//     const $guest = document.createElement("li");
+//     $guest.textContent = guest.name;
+//     return $guest;
+//   });
+//   $ul.replaceChildren(...$guests);
 
-  return $ul;
-}
+//   return $ul;
+// }
 
 function newPartyForm() {
   const $form = document.createElement("form");
   $form.innerHTML = `
-  <h2>Add a New Party</h2>
+  <h2>Add a New Puppy</h2>
     <label>
-        Party Name
+        Puppy Name
         <input name="name" required />
     </label>
     <label>
-        Description
-        <input name="description" required />
+        Breed
+        <input name="breed" required />
     </label>
     <label>
-        Date
-        <input type="date" name="event-date" required />
-    </label>
-    <label>
-        Location
-        <input name="location" required />
-    </label>
-    <button>Add Party</button>
+        Image of Puppy
+        <input name="imageUrl" />
+    <button>Add Puppy</button>
     `;
   $form.addEventListener("submit", function (e) {
     e.preventDefault();
