@@ -1,6 +1,6 @@
 // === Constants ===
-const BASE = "https://fsa-puppy-bowl.herokuapp.com/api/";
-const COHORT = "/2508-PUPPIES";
+const BASE = "https://fsa-puppy-bowl.herokuapp.com/api";
+const COHORT = "/2803-PUPPIES";
 const TEAMS = "/teams";
 const PLAYERS = "/players";
 const apiTeams = BASE + COHORT + TEAMS;
@@ -9,12 +9,10 @@ const apiPlayers = BASE + COHORT + PLAYERS;
 // === State ===
 let puppies = [];
 let selectedPuppy;
-// let rsvps = [];
-// let guests = [];
 
-async function addParty(party) {
+async function addPuppy(puppy) {
   try {
-    const res = await fetch(API + "/events", {
+    const res = await fetch(apiPlayers, {
       method: "POST",
       body: JSON.stringify(party),
       headers: {
@@ -22,32 +20,32 @@ async function addParty(party) {
       },
     });
     const json = await res.json();
-    await getParties();
+    await getPuppies();
   } catch (e) {
     console.error(e);
   }
 }
 
-async function deleteParty(id) {
+async function deletePuppy(id) {
   try {
-    const res = await fetch(API + "/events/" + id, {
+    const res = await fetch(apiPlayers + "/" + id, {
       method: "DELETE",
     });
     const json = await res.json();
-    selectedParty = undefined;
-    await getParties();
+    selectedPuppy = undefined;
+    await getPuppies();
     render();
   } catch (e) {
     console.error(e);
   }
 }
 
-/** Updates state with all parties from the API */
-async function getParties() {
+/** Updates state with all puppies/players from the API */
+async function getPuppies() {
   try {
-    const response = await fetch(API + "/events");
+    const response = await fetch(apiPlayers);
     const result = await response.json();
-    parties = result.data;
+    puppies = result.data;
     render();
   } catch (e) {
     console.error(e);
@@ -55,89 +53,63 @@ async function getParties() {
 }
 
 /** Updates state with a single party from the API */
-async function getParty(id) {
+async function getPuppy(id) {
   try {
-    const response = await fetch(API + "/events/" + id);
+    const response = await fetch(apiPlayers + "/" + id);
     const result = await response.json();
-    selectedParty = result.data;
+    selectedPuppy = result.data;
     render();
   } catch (e) {
     console.error(e);
   }
 }
 
-/** Updates state with all RSVPs from the API */
-// async function getRsvps() {
-//   try {
-//     const response = await fetch(API + "/rsvps");
-//     const result = await response.json();
-//     rsvps = result.data;
-//     render();
-//   } catch (e) {
-//     console.error(e);
-//   }
-// }
-
-/** Updates state with all guests from the API */
-// async function getGuests() {
-//   try {
-//     const response = await fetch(API + "/guests");
-//     const result = await response.json();
-//     guests = result.data;
-//     render();
-//   } catch (e) {
-//     console.error(e);
-//   }
-// }
-
 // === Components ===
 
 /** Party name that shows more details about the party when clicked */
-function PartyListItem(party) {
+function PuppyListItem(puppy) {
   const $li = document.createElement("li");
 
-  if (party.id === selectedParty?.id) {
+  if (puppy.id === selectedPuppy?.id) {
     $li.classList.add("selected");
   }
 
   $li.innerHTML = `
-    <a href="#selected">${party.name}</a>
+    <a href="#selected">${puppy.name}</a>
   `;
-  $li.addEventListener("click", () => getParty(party.id));
+  $li.addEventListener("click", () => getPuppy(puppy.id));
   return $li;
 }
 
-/** A list of names of all parties */
-function PartyList() {
+/** A list of names of all puppies */
+function PuppyList() {
   const $ul = document.createElement("ul");
-  $ul.classList.add("parties");
+  $ul.classList.add("puppies");
 
-  const $parties = parties.map(PartyListItem);
-  $ul.replaceChildren(...$parties);
+  const $puppies = puppies.map(PuppyListItem);
+  $ul.replaceChildren(...$puppies);
 
   return $ul;
 }
 
 /** Detailed information about the selected party */
-function SelectedParty() {
-  if (!selectedParty) {
+function SelectedPuppy() {
+  if (!selectedPuppy) {
     const $p = document.createElement("p");
-    $p.textContent = "Please select a party to learn more.";
+    $p.textContent = "Please select a puppy to learn more.";
     return $p;
   }
 
-  const $party = document.createElement("section");
-  $party.innerHTML = `
-    <h3>${selectedParty.name} #${selectedParty.id}</h3>
-    <time datetime="${selectedParty.date}">
-      ${selectedParty.date.slice(0, 10)}
-    </time>
-    <address>${selectedParty.location}</address>
-    <p>${selectedParty.description}</p>
-    <GuestList></GuestList>
-    <button>Delete Party</button>
+  const $puppy = document.createElement("section");
+  $puppy.innerHTML = `
+    <h3>${selectedPuppy.name} #${selectedPuppy.id}</h3>
+    // <time datetime="${selectedParty.date}">
+    //   ${selectedParty.date.slice(0, 10)}
+    // </time>
+    // <address>${selectedParty.location}</address>
+    // <p>${selectedParty.description}</p>
+    <button>Delete Puppy</button>
   `;
-  $party.querySelector("GuestList").replaceWith(GuestList());
 
   const $delete = $party.querySelector("button");
   $delete.addEventListener("click", function (e) {
@@ -148,27 +120,7 @@ function SelectedParty() {
   return $party;
 }
 
-/** List of guests attending the selected party */
-// function GuestList() {
-//   const $ul = document.createElement("ul");
-//   const guestsAtParty = guests.filter((guest) =>
-//     rsvps.find(
-//       (rsvp) => rsvp.guestId === guest.id && rsvp.eventId === selectedParty.id
-//     )
-//   );
-
-//   // Simple components can also be created anonymously:
-//   const $guests = guestsAtParty.map((guest) => {
-//     const $guest = document.createElement("li");
-//     $guest.textContent = guest.name;
-//     return $guest;
-//   });
-//   $ul.replaceChildren(...$guests);
-
-//   return $ul;
-// }
-
-function newPartyForm() {
+function newPuppyForm() {
   const $form = document.createElement("form");
   $form.innerHTML = `
   <h2>Add a New Puppy</h2>
@@ -188,12 +140,10 @@ function newPartyForm() {
   $form.addEventListener("submit", function (e) {
     e.preventDefault();
     const formData = new FormData($form);
-    const date = new Date(formData.get("event-date"));
-    addParty({
+    addPuppy({
       name: formData.get("name"),
-      description: formData.get("description"),
-      date: date.toISOString(),
-      location: formData.get("location"),
+      breed: formData.get("breed"),
+      imageUrl: formData.get("imageUrl"),
     });
   });
   return $form;
@@ -203,12 +153,12 @@ function newPartyForm() {
 function render() {
   const $app = document.querySelector("#app");
   $app.innerHTML = `
-    <h1>Party Planner</h1>
+    <h1>Puppy Bowl</h1>
     <main>
       <section>
         <h2>Upcoming Parties</h2>
         <PartyList></PartyList>
-        <NewPartyForm></NewPartyForm>
+        <NewPuppyForm></NewPuppyForm>
       </section>
       <section id="selected">
         <h2>Party Details</h2>
@@ -217,15 +167,13 @@ function render() {
     </main>
   `;
 
-  $app.querySelector("PartyList").replaceWith(PartyList());
-  $app.querySelector("SelectedParty").replaceWith(SelectedParty());
-  $app.querySelector("NewPartyForm").replaceWith(newPartyForm());
+  $app.querySelector("PartyList").replaceWith(PuppyList());
+  //$app.querySelector("SelectedParty").replaceWith(SelectedParty());
+  $app.querySelector("NewPuppyForm").replaceWith(newPuppyForm());
 }
 
 async function init() {
-  await getParties();
-  await getRsvps();
-  await getGuests();
+  await getPuppies();
   render();
 }
 
